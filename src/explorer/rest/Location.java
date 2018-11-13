@@ -12,7 +12,7 @@ public class Location
 
    public Location(String input) throws IOException
    {
-      JSONObject json = new JSONObject(RestClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/" + "json?key=" + APIKey + "&input=" + input + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
+      JSONObject json = new JSONObject(RestClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/" + "json?key=" + APIKey + "&input=" + input.replace(" ", "+") + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
       JSONArray candidates = json.getJSONArray("candidates");
 
       if (candidates.length() == 0) {
@@ -29,7 +29,7 @@ public class Location
 
    public static void main(String[] args) {
       try {
-         Location l = new Location("mcdonalds");
+         Location l = new Location("ultimate perk");
          System.out.println(l.latitude + "\n" + l.longitude + "\n" + l.name);
       }
       catch (Exception e) {
