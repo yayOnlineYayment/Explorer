@@ -10,7 +10,6 @@ public class RestClient
    {
       URL url = new URL(urlString);
       URLConnection connection = url.openConnection();
-      return new BufferedReader(new InputStreamReader(
-              connection.getInputStream())).lines().collect(Collectors.joining());
+      return new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining());
    }
 }
