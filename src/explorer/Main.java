@@ -1,5 +1,7 @@
 package explorer;
 
+import explorer.rest.Location;
+
 import java.util.Scanner;
 import java.util.Optional;
 
@@ -9,10 +11,16 @@ public class Main
    {
       System.out.println("Please enter current location: ");
 
-      Scanner input = new Scanner(System.in);
-      String location = input.next();
+      Scanner scanner = new Scanner(System.in);
+      String input = scanner.next();
 
-      //account for locations that don't work
+      try {
+         Location location = new Location(input);
+         String[] nearestAirports = location.nearestAirports();
+      }
+      catch (Exception e) {
+         System.out.println("The location you entered was not recognized.");
+      }
 
       System.out.println("Nearest Airports:");
 

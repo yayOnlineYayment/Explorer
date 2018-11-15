@@ -51,7 +51,7 @@ public class Location
 
    public static void main(String[] args) {
       try {
-         Location l = new Location("boston, ma");
+         Location l = new Location("uhawofidshflkasdjfoiwrgousflidjfdaosf");
          System.out.println(l.latitude + "\n" + l.longitude + "\n" + l.name + "\n");
 
          for (int i=0; i<l.nearestAirports().length; i++)
@@ -61,7 +61,7 @@ public class Location
          }
       }
       catch (Exception e) {
-
+         System.out.println("The location you entered was not recognized.");
       }
    }
 }
