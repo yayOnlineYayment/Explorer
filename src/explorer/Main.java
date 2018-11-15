@@ -34,8 +34,8 @@ public class Main
 
       do
       {
-         input = new Scanner(System.in);
-         airport = input.nextInt();
+         scanner = new Scanner(System.in);
+         airport = scanner.nextInt();
       } while (airport < 0 || airport > 5);
 
       System.out.println("Name: ");
