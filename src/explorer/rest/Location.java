@@ -36,27 +36,28 @@ public class Location
          throw new IllegalArgumentException();
       }
 
-      String airportsString = "";
+      String airports = "";
 
       for (int i=0; i<results.length(); i++) {
          JSONObject result = results.getJSONObject(i);
 
-         if (result.getString("name").toLowerCase().indexOf("heli") == -1) {
-            //result.getString("name") + " " + result.getString("vicinity");
+         if (result.getString("name").toLowerCase().indexOf("heli") == -1 && result.getString("name").toLowerCase().indexOf("shipping") == -1) {
+            airports += "name: " + result.getString("name") + "\nvicinity: " + result.getString("vicinity") + "\n\n";
          }
       }
 
-      //return airports;
+      return airports.substring(0, airports.length()-2).split("\n\n");
    }
 
    public static void main(String[] args) {
       try {
-         Location l = new Location("washington dc");
+         Location l = new Location("boston, ma");
          System.out.println(l.latitude + "\n" + l.longitude + "\n" + l.name + "\n");
 
          for (int i=0; i<l.nearestAirports().length; i++)
          {
             System.out.println(l.nearestAirports()[i]);
+            System.out.println();
          }
       }
       catch (Exception e) {
