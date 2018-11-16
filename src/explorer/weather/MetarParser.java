@@ -165,9 +165,9 @@ public class MetarParser
 
    private int getAltimeterValue(String metar)
    {
-      String altimeterCode = matchedValue(Validator.ALTIMETER, metar, "altimeter").substring(1);
-      boolean isAmerican = metar.matches(".*A\\d{4}.*");
-      int altimeterValue = Integer.valueOf(altimeterCode);
+      String altimeterCode = matchedValue(Validator.ALTIMETER, metar, "altimeter");
+      boolean isAmerican = altimeterCode.startsWith("A");
+      int altimeterValue = Integer.valueOf(altimeterCode.substring(1));
 
       if (isAmerican)
          altimeterValue *= 33.864 / 100;

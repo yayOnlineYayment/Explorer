@@ -5,6 +5,7 @@ import explorer.weather.Weather;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -93,7 +94,7 @@ public class Main
          try
          {
             input = stdin.nextInt();
-         } catch (NumberFormatException e)
+         } catch (InputMismatchException e)
          {
             System.err.printf("I see what you're trying to do. I require an integer in the range [%d, %d). Try again.",
                     lowerInclusive, upperExclusive);
