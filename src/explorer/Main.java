@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * @author David Grossman, Michael Peng
+ */
 public class Main
 {
    private static Scanner stdin = new Scanner(System.in);

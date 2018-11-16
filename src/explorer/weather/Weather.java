@@ -23,7 +23,6 @@ public class Weather
          String response = HttpClient.read(String.format(ENDPOINT, icao.toUpperCase()));
          return response.substring(response.indexOf('\n') + 1);
       }
-
    }
 
    private final String icaoCode, skyCondition;

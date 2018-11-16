@@ -49,7 +49,7 @@ public class Location
 
    public Airport[] nearestAirports(int count) throws IOException
    {
-      return Airport.Database.allAirports()
+      return AirportDatabase.allAirports()
               .sorted(Comparator.comparingDouble(this::distanceTo))
               .limit(count)
               .toArray(Airport[]::new);
