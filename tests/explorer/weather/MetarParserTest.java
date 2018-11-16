@@ -41,7 +41,8 @@ class MetarParserTest
            "ZBAA 101830Z 14001MPS CAVOK 07/M01 Q1025 NOSIG",
            "RJAA 101830Z VRB02KT 9999 FEW020 11/09 Q1019 NOSIG RMK 1CU020 A3011",
            "ZHHH 101800Z VRB01MPS 6000 OVC030 12/11 Q1021 NOSIG",
-           "RCTP 101830Z 21003KT 9999 FEW020 20/19 Q1016 NOSIG RMK A3003"
+           "RCTP 101830Z 21003KT 9999 FEW020 20/19 Q1016 NOSIG RMK A3003",
+           "EDDM 160020Z VRB01KT 0500 R08L/0550N R08R/0550V0800D FZFG NSC M02/M02 Q1028 NOSIG"
    };
 
    private static final String[] BAD_METARS = {
@@ -239,5 +240,60 @@ class MetarParserTest
    {
       Weather weather = parser.parse(metar);
       assertEquals(-6, weather.getCelsius());
+   }
+
+   @ParameterizedTest
+   @ValueSource(strings = {
+           "KBED 152316Z 02004KT 10SM CLR M01/M09 A3039 RMK AO2 T10111094",
+           "KDVO 152315Z AUTO 14005KT 1 3/4SM HZ CLR 17/01 A3009 RMK AO2",
+           "KSAN 152251Z 32007KT 10SM SKC 23/M02 A3001 RMK AO2 SLP162 T02281022",
+           "PHNL 152253Z 04010KT 10SM CLR 28/18 A2996 RMK AO2 SLP144 VCSH NE-E T02830178",
+           "KTAN 152252Z AUTO 00000KT 10SM SKC 00/M04 A3038 RMK AO2 SLP289 T00001044"
+   })
+   void detectAmericanClearSkies(String metar)
+   {
+      Weather weather = parser.parse(metar);
+      assertEquals("Clear skies", weather.getSkyCondition());
+   }
+
+   @ParameterizedTest
+   @ValueSource(strings = {
+           "EFHF 061550Z 04006KT 330V100 CAVOK M02/M11 Q1021",
+           "EFOU 152320Z AUTO 24008KT 9999 CAVOK 07/06 Q1022",
+           "EGHI 152250Z 12006KT 090V150 8000 CAVOK 12/11 Q1021"
+   })
+   void detectWmoClearSkies(String metar)
+   {
+      Weather weather = parser.parse(metar);
+      assertEquals("Clear skies", weather.getSkyCondition());
+   }
+
+   @ParameterizedTest
+   @ValueSource(strings = {
+           "KSAN 152251Z 32007KT 10SM FEW060 SCT100 BKN150 OVC170 23/M02 A3001 RMK AO2 SLP162 T02281022",
+           "KDEN 152253Z 09008KT 10SM FEW060 SCT100 BKN150 OVC170 12/M07 A3012 RMK AO2 SLP174 T01221072",
+           "KSLC 152254Z 29006KT 10SM FEW060 SCT100 BKN150 OVC170 08/M03 A3027 RMK AO2 SLP253 T00831028",
+           "KATL 152252Z 30012KT 10SM FEW060 SCT100 BKN150 OVC170 02/M01 A3007 RMK AO2 SLP188 T00171006",
+           "KMHT 152253Z 09003KT 10SM FEW060 SCT100 BKN150 OVC170 M02/M16 A3040 RMK AO2 SLP315 T10171156"
+   })
+   void detectLayeredClouds(String metar)
+   {
+      Weather weather = parser.parse(metar);
+      assertEquals("Few at 6000 ft, Scattered at 10000 ft, Broken at 15000 ft, Overcast at 17000 ft", weather.getSkyCondition());
+   }
+
+   @ParameterizedTest
+   @ValueSource(strings = {
+           "KSEA 160024Z 18004KT 10SM BKN027 OVC120 12/07 A3025 RMK AO2 T01220072: Broken at 2700 ft, Overcast at 12000 ft",
+           "KPWM 152351Z 00000KT 10SM OVC150 M01/M11 A3044 RMK AO2 SLP309 T10111106 11006 21022 56018: Overcast at 15000 ft",
+           "EDDM 160020Z VRB01KT 0500 FZFG NSC M02/M02 Q1028 NOSIG: Clear skies",
+           "LIRF 160020Z 04005KT CAVOK 11/08 Q1020 NOSIG: Clear skies",
+           "LEMD 160000Z VRB01KT 9999 -DZ VV001TCU 13/12 Q1020 NOSIG: Vertical Visibility 100 ft (Towering cumulus)",
+   })
+   void detectCloudLayerVarieties(String metarExpect)
+   {
+      String[] tokens = metarExpect.split(": ");
+      Weather weather = parser.parse(tokens[0]);
+      assertEquals(tokens[1], weather.getSkyCondition());
    }
 }

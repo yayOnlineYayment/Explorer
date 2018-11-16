@@ -1,67 +1,61 @@
 package explorer.rest;
 
-import org.json.*;
+import explorer.Airport;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Comparator;
 
+/**
+ * @author David Grossman
+ */
 public class Location
 {
-   private double latitude, longitude;
-   private String name;
-   private static final String APIKey = "AIzaSyAUcrM52N8388mbzHXBbkUrXddWEocXJr4";
+   private static final String API_KEY = "AIzaSyAUcrM52N8388mbzHXBbkUrXddWEocXJr4";
 
-   public Location(String input) throws IOException
+   protected double latitude, longitude;
+   protected String name;
+
+   public Location(double latitude, double longitude, String name)
    {
-      JSONObject json = new JSONObject(RestClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=" + APIKey + "&input=" + input.replace(" ", "+") + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
+      this.latitude = latitude;
+      this.longitude = longitude;
+      this.name = name;
+   }
+
+   public static Location fromText(String input) throws IOException
+   {
+      JSONObject json = new JSONObject(RestClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=" + API_KEY + "&input=" + input.replace(" ", "+") + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
       JSONArray candidates = json.getJSONArray("candidates");
 
-      if (candidates.length() == 0) {
-         throw new IllegalArgumentException();
-      }
+      if (candidates.length() == 0)
+         throw new IllegalArgumentException("Invalid location");
 
       JSONObject candidate = candidates.getJSONObject(0);
       JSONObject location = candidate.getJSONObject("geometry").getJSONObject("location");
 
-      this.latitude = location.getDouble("lat");
-      this.longitude = location.getDouble("lng");
-      this.name = candidate.getString("name");
+      return new Location(
+              location.getDouble("lat"),
+              location.getDouble("lng"),
+              candidate.getString("name"));
    }
 
-   public String[] nearestAirports() throws IOException
+   public double distanceTo(Location loc)
    {
-      JSONObject json = new JSONObject(RestClient.read("https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + APIKey + "&location=" + latitude + "," + longitude + "&radius=50000&type=airport"));
-      JSONArray results = json.getJSONArray("results");
-
-      if (results.length() == 0) {
-         throw new IllegalArgumentException();
-      }
-
-      String airports = "";
-
-      for (int i=0; i<results.length(); i++) {
-         JSONObject result = results.getJSONObject(i);
-
-         if (result.getString("name").toLowerCase().indexOf("heli") == -1 && result.getString("name").toLowerCase().indexOf("shipping") == -1) {
-            airports += "name: " + result.getString("name") + "\nvicinity: " + result.getString("vicinity") + "\n\n";
-         }
-      }
-
-      return airports.substring(0, airports.length()-2).split("\n\n");
+      return Math.hypot(loc.latitude - latitude, loc.longitude - longitude);
    }
 
-   public static void main(String[] args) {
-      try {
-         Location l = new Location("uhawofidshflkasdjfoiwrgousflidjfdaosf");
-         System.out.println(l.latitude + "\n" + l.longitude + "\n" + l.name + "\n");
+   public Airport[] nearestAirports(int count) throws IOException
+   {
+      return Airport.Database.allAirports()
+              .sorted(Comparator.comparingDouble(this::distanceTo))
+              .limit(count)
+              .toArray(Airport[]::new);
+   }
 
-         for (int i=0; i<l.nearestAirports().length; i++)
-         {
-            System.out.println(l.nearestAirports()[i]);
-            System.out.println();
-         }
-      }
-      catch (Exception e) {
-         System.out.println("The location you entered was not recognized.");
-      }
+   public String getName()
+   {
+      return name;
    }
 }

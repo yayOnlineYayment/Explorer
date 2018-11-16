@@ -1,48 +1,102 @@
 package explorer;
 
 import explorer.rest.Location;
+import explorer.weather.MetarParser;
+import explorer.weather.Weather;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
-import java.util.Optional;
 
 public class Main
 {
+   private static Scanner stdin = new Scanner(System.in);
+
    public static void main(String[] args)
    {
-      System.out.println("Please enter current location: ");
+      String target = "";
 
-      Scanner scanner = new Scanner(System.in);
-      String input = scanner.next();
+      while (true)
+      {
+         try
+         {
+            target = readLine("Please enter target location: ");
+            Location location = Location.fromText(target);
+            System.out.println("Processed as " + location.getName());
+            int airportCount = readInt("How many airports to show? (up to 50): ", 1, 51);
+            Airport[] nearestAirports = location.nearestAirports(airportCount);
 
-      try {
-         Location location = new Location(input);
-         String[] nearestAirports = location.nearestAirports();
+            System.out.println("Nearest Airports:");
+            for (int i = 0; i < nearestAirports.length; ++i)
+               System.out.printf("%d. %s\n", i + 1, nearestAirports[i]);
+
+            System.out.println();
+            int selection = readInt("Select an airport (0 to exit): ", 0, airportCount + 1);
+
+            if (selection == 0)
+               break;
+
+            Airport currentAirport = nearestAirports[selection - 1];
+            System.out.println("You have selected: " + currentAirport);
+            System.out.println(Weather.Retriever.readWeather(currentAirport.getIcaoCode()));
+
+         } catch (FileNotFoundException metarNotFound)
+         {
+            System.err.println("The METAR for this aerodrome is unavailable");
+         } catch (IOException genericIO)
+         {
+            if (genericIO.getMessage() == null)
+            {
+               System.err.println("An unspecified I/O error occurred. Stack trace follows");
+               genericIO.printStackTrace();
+            } else
+            {
+               System.err.printf("An I/O error occurred: %s\n", genericIO.getMessage());
+            }
+         } catch (MetarParser.MissingValueException metarMissingValue)
+         {
+            System.err.println("Received METAR is missing value: " + metarMissingValue.getMessage());
+         } catch (MetarParser.InvalidFormatException badMetarFormat)
+         {
+            System.err.println("Received METAR is either invalid or unsupported: " + badMetarFormat.getMessage());
+         } catch (IllegalArgumentException badLocation)
+         {
+            System.err.printf("'%s' is not a valid location\n", target);
+         }
       }
-      catch (Exception e) {
-         System.out.println("The location you entered was not recognized.");
-      }
+   }
 
-      System.out.println("Nearest Airports:");
-
-      for (int i=1; i<=5; i++) {
-         System.out.println(i + ": Airport");
-      }
-
-      System.out.println("Select an airport (0 to exit): ");
-
-      int airport;
+   private static String readLine(String prompt)
+   {
+      String input;
 
       do
       {
-         scanner = new Scanner(System.in);
-         airport = scanner.nextInt();
-      } while (airport < 0 || airport > 5);
+         System.out.print(prompt);
+         input = stdin.nextLine();
 
-      System.out.println("Name: ");
-      System.out.println("IATA Code: ");
-      System.out.println("ICAO Code: ");
-      System.out.println("Latitude: ");
-      System.out.println("Distance from current location: ");
-      System.out.println("Weather: ");
+      } while (input == null || input.trim().length() == 0);
+
+      return input;
+   }
+
+   private static int readInt(String prompt, int lowerInclusive, int upperExclusive)
+   {
+      int input = lowerInclusive - 1;
+
+      do
+      {
+         System.out.print(prompt);
+         try
+         {
+            input = stdin.nextInt();
+         } catch (NumberFormatException e)
+         {
+            System.err.printf("I see what you're trying to do. I require an integer in the range [%d, %d). Try again.",
+                    lowerInclusive, upperExclusive);
+         }
+      } while (input < lowerInclusive || input >= upperExclusive);
+
+      return input;
    }
 }
