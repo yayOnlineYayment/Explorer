@@ -289,6 +289,7 @@ class MetarParserTest
            "EDDM 160020Z VRB01KT 0500 FZFG NSC M02/M02 Q1028 NOSIG: Clear skies",
            "LIRF 160020Z 04005KT CAVOK 11/08 Q1020 NOSIG: Clear skies",
            "LEMD 160000Z VRB01KT 9999 -DZ VV001TCU 13/12 Q1020 NOSIG: Vertical Visibility 100 ft (Towering cumulus)",
+           "LFPB 160300Z AUTO 09007KT 2300 BR VV/// 09/08 Q1024 TEMPO 0800 FG: Vertical Visibility below weather station level"
    })
    void detectCloudLayerVarieties(String metarExpect)
    {

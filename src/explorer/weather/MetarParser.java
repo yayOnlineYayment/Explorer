@@ -198,7 +198,7 @@ public class MetarParser
 
    private String formatCloudLayer(String cloudLayer)
    {
-      String[] tokens = cloudLayer.split("((?<=[A-Z])(?=\\d)|(?<=\\d)(?=[A-Z]))");
+      String[] tokens = cloudLayer.split("((?<=[A-Z])(?=[\\d/])|(?<=[\\d/])(?=[A-Z]))");
       String output = "";
 
       // I really could've used a Map for denseness and less noise, so this is
