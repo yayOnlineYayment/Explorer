@@ -1,8 +1,5 @@
 package explorer;
 
-import explorer.rest.Location;
-import explorer.rest.RestClient;
-
 import java.io.IOException;
 import java.util.stream.Stream;
 
@@ -26,7 +23,7 @@ public class Airport extends Location
       private static Stream<String> csvLines() throws IOException
       {
          if (DB_CACHE == null)
-            DB_CACHE = RestClient.lines(CSV_ENDPOINT).toArray(String[]::new);
+            DB_CACHE = HttpClient.lines(CSV_ENDPOINT).toArray(String[]::new);
 
          return Stream.of(DB_CACHE);
       }

@@ -1,6 +1,5 @@
-package explorer.rest;
+package explorer;
 
-import explorer.Airport;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,7 +25,7 @@ public class Location
 
    public static Location fromText(String input) throws IOException
    {
-      JSONObject json = new JSONObject(RestClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=" + API_KEY + "&input=" + input.replace(" ", "+") + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
+      JSONObject json = new JSONObject(HttpClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=" + API_KEY + "&input=" + input.replace(" ", "+") + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
       JSONArray candidates = json.getJSONArray("candidates");
 
       if (candidates.length() == 0)
