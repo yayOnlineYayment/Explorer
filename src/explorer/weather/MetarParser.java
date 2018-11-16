@@ -105,7 +105,7 @@ public class MetarParser
    {
       if (isClearSkies(metar))
          skyCondition = "Clear skies";
-      else if (metar.contains(" NCD "))
+      else if (metar.indexOf(" NCD ") != -1)
          skyCondition = "No cloud type determined";
       else if (!metar.matches(".*(FEW|SCT|BKN|OVC|VV).*"))
          skyCondition = "No cloud layers included";
@@ -126,10 +126,10 @@ public class MetarParser
 
    private boolean isClearSkies(String metar)
    {
-      return metar.contains(" CLR ") ||
-              metar.contains(" CAVOK ") ||
-              metar.contains(" SKC ") ||
-              metar.contains(" NSC ");
+      return metar.indexOf(" CLR ") != -1 ||
+              metar.indexOf(" CAVOK ") != -1 ||
+              metar.indexOf(" SKC ") != -1 ||
+              metar.indexOf(" NSC ") != -1;
    }
 
    private int parseTemperature(String metar)

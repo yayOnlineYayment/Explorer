@@ -25,7 +25,9 @@ public class Location
 
    public static Location fromText(String input) throws IOException
    {
-      JSONObject json = new JSONObject(HttpClient.read("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=" + API_KEY + "&input=" + input.replace(" ", "+") + "&inputtype=textquery&locationbias=ipbias&fields=name,geometry"));
+      JSONObject json = new JSONObject(HttpClient.read(
+              "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=" + API_KEY + "&input=" +
+                      "&inputtype=textquery&locationbias=ipbias&fields=name,geometry" + input.replace(" ", "+")));
       JSONArray candidates = json.getJSONArray("candidates");
 
       if (candidates.length() == 0)
