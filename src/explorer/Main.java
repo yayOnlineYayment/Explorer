@@ -68,6 +68,7 @@ public class Main
 
    private static String readLine(String prompt)
    {
+      stdin = new Scanner(System.in);
       String input;
 
       do
