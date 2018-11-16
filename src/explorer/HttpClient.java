@@ -1,4 +1,4 @@
-package explorer.rest;
+package explorer;
 
 import java.io.*;
 import java.net.*;
@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * @author David Grossman
  */
-public class RestClient
+public class HttpClient
 {
    public static String read(String urlString) throws IOException
    {

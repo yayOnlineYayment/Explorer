@@ -1,6 +1,5 @@
 package explorer;
 
-import explorer.rest.Location;
 import explorer.weather.MetarParser;
 import explorer.weather.Weather;
 

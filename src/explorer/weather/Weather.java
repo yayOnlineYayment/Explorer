@@ -1,6 +1,6 @@
 package explorer.weather;
 
-import explorer.rest.RestClient;
+import explorer.HttpClient;
 
 import java.io.IOException;
 
@@ -20,7 +20,7 @@ public class Weather
 
       public static String readMetar(String icao) throws IOException
       {
-         String response = RestClient.read(String.format(ENDPOINT, icao.toUpperCase()));
+         String response = HttpClient.read(String.format(ENDPOINT, icao.toUpperCase()));
          return response.substring(response.indexOf('\n') + 1);
       }
 
