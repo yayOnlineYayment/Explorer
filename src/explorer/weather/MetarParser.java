@@ -1,7 +1,10 @@
 package explorer.weather;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,10 +68,43 @@ public class MetarParser
       }
    }
 
+   private static final String[][] PRESENT_WEATHER_FORMAT = {
+           {"MI", "shallow"},
+           {"BC", "patches"},
+           {"PR", "partial"},
+           {"DR", "low drifting"},
+           {"BL", "blowing"},
+           {"TS", "thunderstorm"},
+           {"FZ", "freezing"},
+           {"DZ", "drizzle"},
+           {"RA", "rain"},
+           {"SN", "snow"},
+           {"SG", "snow grains"},
+           {"PL", "ice pellets"},
+           {"GR", "hail"},
+           {"GS", "snow pellets"},
+           {"UP", "unknown precipitation"},
+           {"BR", "mist"},
+           {"FG", "fog"},
+           {"FU", "smoke"},
+           {"VA", "volcanic ash"},
+           {"DU", "widespread dust"},
+           {"SA", "sand"},
+           {"HZ", "haze"},
+           {"PO", "dust whirls"},
+           {"SQ", "squalls"},
+           {"FC", "funnel clouds"},
+           // Darude...
+           {"SS", "sandstorm"},
+           {"DS", "dust storm"},
+           {"SH", "showers"}
+   };
+
    private int windHeading = 0, windKnots = 0;
    private Integer windGust = null;
    private String icaoCode, skyCondition = "Unspecified";
    private int altimeterValue;
+   private String presentWeather = "";
 
    public Weather parse(String metar)
    {
@@ -96,9 +132,46 @@ public class MetarParser
 
       parseWind(metar);
       parseSkyCondition(metar);
+      parsePresentWeather(metar);
       int temp = parseTemperature(metar);
 
-      return new Weather(icaoCode, altimeterValue, windHeading, windKnots, temp, skyCondition, windGust);
+
+      return new Weather(icaoCode, altimeterValue, windHeading,
+              windKnots, temp, skyCondition, presentWeather, windGust);
+   }
+
+   private void parsePresentWeather(String metar)
+   {
+      LinkedList<String> strings = new LinkedList<>();
+      doWithPresentConditionTokens(metar, token -> strings.add(formatPresentConditionToken(token)));
+      presentWeather = String.join(", ", strings);
+   }
+
+   private void doWithPresentConditionTokens(String metar, Consumer<String> forEachToken)
+   {
+      final Matcher matcher = Pattern
+              .compile("\\s(-|\\+|VC)?(MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS){1,8}")
+              .matcher(metar);
+
+      while (matcher.find())
+         forEachToken.accept(matcher.group().trim());
+   }
+
+   private String formatPresentConditionToken(String token)
+   {
+      String format = Stream.of(PRESENT_WEATHER_FORMAT)
+              .filter(pair -> token.contains(pair[0]))
+              .map(pair -> pair[1])
+              .collect(Collectors.joining(" "));
+
+      if (token.startsWith("+"))
+         return "Heavy " + format;
+      else if (token.startsWith("VC"))
+         return format + "in the vicinity";
+      else if (token.startsWith("-"))
+         return "Light " + format;
+      else
+         return "Moderate " + format;
    }
 
    private void parseSkyCondition(String metar)
@@ -165,9 +238,9 @@ public class MetarParser
 
    private int getAltimeterValue(String metar)
    {
-      String altimeterCode = matchedValue(Validator.ALTIMETER, metar, "altimeter").substring(1);
-      boolean isAmerican = metar.matches(".*A\\d{4}.*");
-      int altimeterValue = Integer.valueOf(altimeterCode);
+      String altimeterCode = matchedValue(Validator.ALTIMETER, metar, "altimeter");
+      boolean isAmerican = altimeterCode.startsWith("A");
+      int altimeterValue = Integer.valueOf(altimeterCode.substring(1));
 
       if (isAmerican)
          altimeterValue *= 33.864 / 100;

@@ -25,7 +25,7 @@ public class Weather
       }
    }
 
-   private final String icaoCode, skyCondition;
+   private final String icaoCode, skyCondition, presentWeather;
    /**
     * In the US, altimeter is expressed in inHg (29.92).
     * For example, this is encoded in the form "1013", since it is represented in hPa.
@@ -35,9 +35,14 @@ public class Weather
    private final int windDirection, windSpeed, celsius;
    private final Integer windGust;
 
-   public Weather(String icaoCode, int altimeter, int windDirection, int windSpeed, int celsius, String skyCondition)
+   public Weather(String icaoCode,
+                  int altimeter,
+                  int windDirection,
+                  int windSpeed,
+                  int celsius,
+                  String skyCondition, String presentWeather)
    {
-      this(icaoCode, altimeter, windDirection, windSpeed, celsius, skyCondition, null);
+      this(icaoCode, altimeter, windDirection, windSpeed, celsius, skyCondition, presentWeather, null);
    }
 
    public Weather(String icaoCode,
@@ -45,9 +50,11 @@ public class Weather
                   int windDirection,
                   int windSpeed,
                   int celsius,
-                  String skyCondition, Integer windGust)
+                  String skyCondition,
+                  String presentWeather, Integer windGust)
    {
       this.icaoCode = icaoCode;
+      this.presentWeather = presentWeather;
       this.altimeter = altimeter;
       this.windDirection = windDirection;
       this.windSpeed = windSpeed;
@@ -91,17 +98,23 @@ public class Weather
       return skyCondition;
    }
 
+   public String getPresentWeather()
+   {
+      return presentWeather;
+   }
+
    @Override
    public String toString()
    {
       double fahrenheit = celsius * 9.0 / 5.0 + 32;
-      return String.format("Weather for %s:\nAltimeter: %d hPa\nSky Condition: %s\nWind: %s at %d knots%s\nTemperature: %d °C (%.2f °F)\n",
+      return String.format("Weather for %s:\nAltimeter: %d hPa\nSky Condition: %s\nWind: %s at %d knots%s\nTemperature: %d °C (%.2f °F)\n%s",
               icaoCode.toUpperCase(),
               altimeter,
               skyCondition.trim().isEmpty() ? "Unknown" : skyCondition,
               windDirection < 0 ? "variable": windDirection + "°",
               windSpeed,
               windGust == null ? "" : " gusting " + windGust + " knots",
-              celsius, fahrenheit);
+              celsius, fahrenheit,
+              presentWeather.trim().isEmpty() ? "" : presentWeather + '\n');
    }
 }

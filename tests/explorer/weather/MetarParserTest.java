@@ -42,7 +42,8 @@ class MetarParserTest
            "RJAA 101830Z VRB02KT 9999 FEW020 11/09 Q1019 NOSIG RMK 1CU020 A3011",
            "ZHHH 101800Z VRB01MPS 6000 OVC030 12/11 Q1021 NOSIG",
            "RCTP 101830Z 21003KT 9999 FEW020 20/19 Q1016 NOSIG RMK A3003",
-           "EDDM 160020Z VRB01KT 0500 R08L/0550N R08R/0550V0800D FZFG NSC M02/M02 Q1028 NOSIG"
+           "EDDM 160020Z VRB01KT 0500 R08L/0550N R08R/0550V0800D FZFG NSC M02/M02 Q1028 NOSIG",
+           "ZKPY 310200Z 00000MPS 5000 BR SCT200 17/06 Q1019 NOSIG"
    };
 
    private static final String[] BAD_METARS = {
@@ -124,7 +125,7 @@ class MetarParserTest
 
    @ParameterizedTest
    @ValueSource(strings = {
-           "EDDW 141520Z 19005KT 9999 FEW022 11/08 Q1022 NOSIG",
+           "EDDW 141520Z 19005KT 9999 FEW022 11/08 Q1022 NOSIG A3000",
            "EGSS 141520Z AUTO 17008KT 9999 NCD 12/08 Q1022",
            "ZGGG 141530Z 16003MPS 9999 BKN050 25/18 Q1022 NOSIG",
            "YSSY 141500Z 31005KT CAVOK 20/17 Q1022 NOSIG"
@@ -296,5 +297,21 @@ class MetarParserTest
       String[] tokens = metarExpect.split(": ");
       Weather weather = parser.parse(tokens[0]);
       assertEquals(tokens[1], weather.getSkyCondition());
+   }
+
+   @ParameterizedTest
+   @ValueSource(strings = {
+           "LEMD 160000Z VRB01KT 9999 -DZ VV001TCU 13/12 Q1020 NOSIG: Light drizzle",
+           "EDDM 160020Z VRB01KT 0500 FZFG NSC M02/M02 Q1028 NOSIG: Moderate freezing fog",
+           "EFHF 061550Z 04006KT 330V100 CAVOK M02/M11 Q1021:  ",
+           "KCNO 190353Z 00000KT 4SM HZ CLR 13/07 A3003 RMK AO2 SLP168 T01280067: Moderate haze",
+           "KSFO 190356Z 30005KT 2SM BR FU BKN017 11/09 A3005 RMK AO2 SLP176 T01110089 $: Moderate mist, Moderate smoke",
+           "EDDM 190420Z 04007KT 010V070 9999 -SN SCT018 BKN035 M00/M02 Q1014 NOSIG: Light snow"
+   })
+   void parsePresentWeather(String metarExpect)
+   {
+      String[] tokens = metarExpect.split(": ");
+      Weather weather = parser.parse(tokens[0]);
+      assertEquals(tokens[1].trim(), weather.getPresentWeather());
    }
 }
