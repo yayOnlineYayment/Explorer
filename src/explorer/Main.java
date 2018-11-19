@@ -5,6 +5,7 @@ import explorer.weather.Weather;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -61,8 +62,7 @@ public class Main
          } catch (MetarParser.InvalidFormatException badMetarFormat)
          {
             System.err.println("Received METAR is either invalid or unsupported: " + badMetarFormat.getMessage());
-         } catch (IllegalArgumentException badLocation)
-         {
+         } catch (IllegalArgumentException badLocation) {
             System.err.printf("'%s' is not a valid location\n", target);
          }
       }
@@ -70,12 +70,13 @@ public class Main
 
    private static String readLine(String prompt)
    {
-      stdin = new Scanner(System.in);
       String input;
+
+      System.out.print(prompt);
 
       do
       {
-         System.out.print(prompt);
+         //System.out.print(prompt);
          input = stdin.nextLine();
 
       } while (input == null || input.trim().length() == 0);
@@ -93,10 +94,14 @@ public class Main
          try
          {
             input = stdin.nextInt();
+         } catch (InputMismatchException notInt) {
+            System.err.println("Entered value is not an integer.");
+            stdin.nextLine();
          } catch (NumberFormatException e)
          {
             System.err.printf("I see what you're trying to do. I require an integer in the range [%d, %d). Try again.",
                     lowerInclusive, upperExclusive);
+            stdin.nextLine();
          }
       } while (input < lowerInclusive || input >= upperExclusive);
 
