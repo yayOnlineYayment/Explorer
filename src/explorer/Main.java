@@ -65,13 +65,15 @@ public class Main
          } catch (IllegalArgumentException badLocation)
          {
             System.err.printf("'%s' is not a valid location\n", target);
+         } catch (Exception generic)
+         {
+            System.err.println("Catastrophic failure: " + generic.getMessage());
          }
       }
    }
 
    private static String readLine(String prompt)
    {
-      stdin = new Scanner(System.in);
       String input;
 
       do
@@ -96,8 +98,11 @@ public class Main
             input = stdin.nextInt();
          } catch (InputMismatchException e)
          {
-            System.err.printf("I see what you're trying to do. I require an integer in the range [%d, %d). Try again.",
+            System.err.printf("I see what you're trying to do. I require an integer in the range [%d, %d). Try again.\n",
                     lowerInclusive, upperExclusive);
+         } finally
+         {
+            stdin.nextLine();
          }
       } while (input < lowerInclusive || input >= upperExclusive);
 
